@@ -1,0 +1,294 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>important</title>
+	<style>
+		body {
+			background-color: white;
+	    	text-align: center;
+	    	font-family: Arial;
+	    	transition: opacity 1s ease;
+	    }
+	    button {
+	    	padding: 10px;
+	    }
+	    .hidden {
+	    	display: none;
+	    }
+	    .fade-black {
+  			background-color: black;
+  			transition: background-color 1s ease;
+		}
+	    .fade-chartreuse {
+  			background-color: chartreuse;
+  			transition: background-color 4s ease;
+		}
+		.fade-in {
+    		transition: opacity 4s ease;
+  		}
+  		.fade-out {
+    		opacity: 0;
+    		transition: opacity 1s ease;
+		}
+		.lower-button {
+			margin-top: 200px;
+		}
+	</style>
+</head>
+<body>
+	<h1 id='greeting'>hello</h1>
+	<h2 id='ask'>would you be my valentine :)</h2>
+
+	<button id='ybutton' onclick='yes()'>yes ofc!!!</button>
+	<button id='nbutton' onclick='no()'>don't get your hopes up pal... (= "I hate you, Julian, and wish the worst for you.")</button>
+	<button id='rbutton' onclick='retry()' class='hidden'>retry? (you should)</button>
+	<button id='gbutton' onclick='go()' class='hidden'>no i think it's correct</button>
+	<div id='counter'></div>
+	<div id='achievements'></div>
+	<button id='hrbutton' onclick='hard_resest()' class='lower-button'>reset ALL data</button>
+
+	<script>
+		const greeting = document.getElementById('greeting');
+		const ask = document.getElementById('ask');
+		const ybutton = document.getElementById('ybutton');
+		const nbutton = document.getElementById('nbutton');
+		const rbutton = document.getElementById('rbutton');
+		const gbutton = document.getElementById('gbutton');
+		const hrbutton = document.getElementById('hrbutton');
+		const achievements = document.getElementById('achievements');
+
+		let y_stage = 0;
+		let n_stage = 0;
+		let no_clicks = Number(localStorage.getItem('no_clicks')) || 0;
+		document.getElementById('counter').innerHTML = '# of no clicks: ' + no_clicks;
+		let got_yes_ending = localStorage.getItem('got_yes_ending') === 'true';
+		let got_no_ending  = localStorage.getItem('got_no_ending') === 'true';
+
+		let achievements_list = [];
+		if (got_yes_ending) achievements_list.push('yes ending');
+		if (got_no_ending) achievements_list.push('no ending');
+
+		let earned;
+
+		if (achievements_list.length === 0) {
+			earned = 'nothing';
+		} else if (achievements_list.length === 1) {
+			earned = achievements_list[0];
+		} else if (achievements_list.length === 2) {
+			earned = achievements_list;
+		}
+		achievements.innerHTML = "you've earned: " + earned;
+
+		function yes() {
+			y_stage++
+
+			if (n_stage == 4) {
+				localStorage.setItem('got_no_ending', 'true');
+				got_no_ending = true;
+
+				document.body.style.backgroundImage = 'url("calm_tongue_hamster.jpg")';
+				document.body.style.backgroundSize = 'contain';
+				document.body.style.backgroundRepeat = 'no-repeat';
+				document.body.style.backgroundPosition = 'center';
+				greeting.classList.add('hidden');
+				ybutton.classList.add('hidden');
+				nbutton.classList.add('hidden');
+
+				rbutton.innerHTML = 'is there more? (yes)'
+				rbutton.classList.add('lower-button')
+				rbutton.classList.remove('hidden');
+			} else if (y_stage == 2) {
+				greeting.classList.add('hidden');
+				ask.classList.add('hidden');
+				ybutton.classList.add('hidden');
+				nbutton.classList.add('hidden');
+				setTimeout(() => {
+					greeting.innerHTML = "that's not very nice :(";
+					greeting.classList.remove('hidden');
+					setTimeout(() => {
+						ask.innerHTML = 'do you really mean that :(';
+						ask.classList.remove('hidden');
+						setTimeout(() => {
+							ybutton.disabled = true;
+							nbutton.disabled = true;
+							ybutton.classList.remove('hidden');
+							nbutton.classList.remove('hidden');
+							setTimeout(() => {
+								greeting.innerHTML = "no i've had enough of your shenanigans";
+								ask.innerHTML = 'we are DONE';
+								ybutton.classList.add('hidden');
+								nbutton.classList.add('hidden');
+								setTimeout(() => {
+									localStorage.setItem('got_yes_ending', 'true');
+									got_yes_ending = true;
+
+									rbutton.innerHTML = 'retry? (hint: try being super defiant)';
+									rbutton.classList.remove('hidden');
+								})
+							}, 1000)
+						}, 500)
+					}, 500);
+				}, 500);
+			} else {
+				document.body.classList.add('fade-chartreuse');
+
+				greeting.style.opacity = 0;
+				greeting.innerHTML = 'yay!!!!!';
+				greeting.classList.add('fade-in');
+
+				setTimeout(() => {
+	    			greeting.style.opacity = 1;
+	  			}, 50);
+
+				document.body.style.color = '#660033';
+				document.body.style.padding = '100px';
+				document.body.style.fontSize = '40px';
+				ask.classList.add('hidden');
+				ybutton.classList.add('hidden');
+				nbutton.classList.add('hidden');
+				hrbutton.remove();
+				document.getElementById('counter').remove();
+				achievements.remove();
+
+				if (no_clicks >= 5) {
+				    setTimeout(() => {
+				    	greeting.innerHTML = 'wait'
+				    	setTimeout(() => {
+					        greeting.innerHTML = `you clicked no ${no_clicks} times`;
+					        setTimeout(() => {
+					        	ask.innerHTML = 'do you think im some kind of joke';
+					        	ask.classList.remove('hidden');
+					        	setTimeout(() => {
+					        		ybutton.classList.remove('hidden');
+					        		nbutton.classList.remove('hidden');
+					        		nbutton.addEventListener('mouseenter', () => {
+								        nbutton.innerHTML = 'yes ofc!!!';
+								        nbutton.onclick = yes;
+							    	});
+							    	nbutton.addEventListener('mouseleave', () => {
+								        nbutton.innerHTML = 'don\'t get your hopes up pal... (= "I hate you, Julian, and wish the worst for you.")';
+								        nbutton.onclick = no;
+							    	});
+					        	}, 1000);
+					        }, 1000);
+			        	}, 500);
+			        }, 1000);
+				} else {
+					rbutton.innerHTML = 'retry? (hint: try clicking no and then retry a few times)'
+					rbutton.classList.remove('hidden');
+				}
+			}
+		}
+
+		function no() {
+			no_clicks++;
+			localStorage.setItem('no_clicks', no_clicks);
+			document.body.classList.add('fade-black');
+
+			ask.classList.add('fade-out');
+			ybutton.classList.add('fade-out');
+			nbutton.classList.add('fade-out');
+			hrbutton.classList.add('fade-out');
+
+			setTimeout(() => {
+			document.body.style.backgroundImage = 'url("saturn_devouring_his_son.jpg")';
+			document.body.style.backgroundSize = 'contain';
+			document.body.style.color = 'red';
+			document.body.style.padding = '100px';
+			document.body.style.fontSize = '40px';
+			greeting.innerHTML = 'wrong answer';
+			ask.remove();
+			ybutton.classList.add('hidden')
+			nbutton.classList.add('hidden');
+			hrbutton.remove();
+			rbutton.classList.remove('hidden');
+			gbutton.classList.remove('hidden');
+			document.getElementById('counter').classList.add('hidden');
+			achievements.remove();
+
+			document.body.style.opacity = 1;
+   			document.body.classList.remove('fade-black');
+			}, 1000);
+		}
+
+		function retry() {
+			location.reload();
+		}
+
+		function go() {
+			n_stage++;
+			if (n_stage == 4) {
+				greeting.classList.add('hidden');
+				gbutton.classList.add('hidden');
+				setTimeout(() => {
+					greeting.innerHTML = 'so you will be my valentine';
+					greeting.classList.remove('hidden');
+					setTimeout(() => {
+						nbutton.addEventListener('mouseenter', () => {
+							nbutton.innerHTML = 'yes ofc!!! [i right through you.]';
+							nbutton.onclick = yes;
+						});
+						ybutton.classList.remove('fade-out');
+						nbutton.classList.remove('fade-out');
+						ybutton.disabled = false;
+						nbutton.disabled = false;
+						ybutton.classList.remove('hidden');
+						nbutton.classList.remove('hidden');
+					}, 2000);
+				}, 2000);
+			} else if (n_stage == 3) {
+				greeting.classList.add('hidden');
+				gbutton.classList.add('hidden');
+				setTimeout(() => {
+					greeting.innerHTML = 'ok sorry';
+					greeting.style.fontSize = '20px';
+					greeting.style.color = 'white';
+					greeting.classList.remove('hidden');
+					setTimeout(() => {
+						gbutton.innerHTML = 'ok thank you';
+						gbutton.classList.remove('hidden');
+					}, 1000)
+				}, 1500);
+			} else if (n_stage == 2) {
+				greeting.classList.add('hidden');
+				rbutton.classList.add('hidden');
+				gbutton.classList.add('hidden');
+				setTimeout(() => {
+					greeting.classList.remove('hidden');
+					greeting.innerHTML = 'oh';
+					setTimeout(() => {
+						greeting.classList.add('hidden');
+						setTimeout(() => {
+							greeting.classList.remove('hidden');
+							greeting.innerHTML = 'okay';
+							setTimeout(() => {
+								gbutton.innerHTML = 'yeah';
+								gbutton.classList.remove('hidden');
+							}, 1000);
+						}, 2000);
+					}, 2000);
+				}, 1000);
+			} else if (n_stage == 1) {
+				greeting.innerHTML = "what no it isn't"
+				rbutton.classList.add('hidden');
+				gbutton.classList.add('hidden');
+				setTimeout(() => {
+					gbutton.innerHTML = 'yeah it is'
+					gbutton.classList.remove('hidden');
+				}, 500);
+			}
+		}
+
+		function hard_resest() {
+			localStorage.setItem('no_clicks', 0);
+			no_clicks = 0;
+			localStorage.setItem('got_no_ending', 'false');
+			got_no_ending = false;
+			localStorage.setItem('got_yes_ending', 'false');
+			got_yes_ending = false;
+			location.reload();
+		}
+	</script>
+
+</body>
+</html>
